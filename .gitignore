@@ -23,11 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
 .env
+.env.production
 .env.local
-.env.*.local
-
-# Databases
-*.sqlite
-*.sqlite3
+.env.development.local
+.env.test.local
+.env.production.local

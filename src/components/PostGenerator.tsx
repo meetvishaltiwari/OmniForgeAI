@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, Loader2, Settings2, PenLine } from 'lucide-react';
-import { PublishActions } from './Shared';
 import { useToast } from '../contexts/ToastContext';
+import { PublishActions } from './Shared';
 
-export function PostGenerator({ prefillData, onNavigate }: { prefillData?: any, onNavigate?: (tab: string, data?: any) => void }) {
-  const { showQuotaError, showToast } = useToast();
+export function PostGenerator({ prefillData, onNavigate }: { prefillData?: any, onNavigate?: (id: any, data?: any) => void }) {
   const [topic, setTopic] = useState('');
   const [audience, setAudience] = useState('General Professionals');
   const [tone, setTone] = useState('Professional & Insightful');
@@ -14,14 +13,12 @@ export function PostGenerator({ prefillData, onNavigate }: { prefillData?: any, 
   const [platform, setPlatform] = useState('LinkedIn');
   const [post, setPost] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { showToast, showQuotaError } = useToast();
 
   useEffect(() => {
-     if(prefillData) {
-        setTopic(prefillData.topic || '');
-        setAudience(prefillData.audience || 'General Professionals');
-        setTone(prefillData.tone || 'Professional & Insightful');
-        setHookStyle(prefillData.hookStyle || 'how_to');
-        if(prefillData.output_payload?.post) setPost(prefillData.output_payload.post);
+     if (prefillData) {
+       if (prefillData.topic) setTopic(prefillData.topic);
+       if (prefillData.niche) setKeywords(prefillData.niche);
      }
   }, [prefillData]);
 
