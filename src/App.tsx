@@ -1,80 +1,80 @@
-import { useState, useEffect } from 'react';
-import { Sparkles, Compass, Recycle, Lightbulb, ImagePlus, PenTool, MessageCircle, Calendar as CalIcon, Megaphone, Menu, X, Database, LogOut, TrendingUp, Layers, Palette, ChevronDown, ChevronRight, ArrowLeft } from 'lucide-react';
-
-import { LoginScreen } from './components/LoginScreen';
-
-// Modules
-import { TrendAnalyser } from './components/TrendAnalyser';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  Sparkles, 
+  Menu, 
+  X, 
+  ChevronDown, 
+  ChevronRight, 
+  Layers, 
+  Megaphone, 
+  PenTool, 
+  ImagePlus, 
+  MessageCircle, 
+  Palette, 
+  Database,
+  Recycle,
+  LogOut,
+  Compass,
+  TrendingUp,
+  ArrowLeft,
+  Calendar as CalIcon
+} from 'lucide-react';
+import { ActivityDashboard } from './components/ActivityDashboard';
+import { BrandKitManager } from './components/BrandKitManager';
 import { CampaignWizard } from './components/CampaignWizard';
 import { CommandCenter } from './components/CommandCenter';
 import { DiscoveryHub } from './components/DiscoveryHub';
-import { RepurposingEngine } from './components/RepurposingEngine';
+import { EngagementAssistant } from './components/EngagementAssistant';
+import { FeedViewer } from './components/FeedViewer';
+import { HookGenerator } from './components/HookGenerator';
+import { LoginScreen } from './components/LoginScreen';
 import { PostBuilder } from './components/PostBuilder';
+import { RepurposingEngine } from './components/RepurposingEngine';
 import { RewriterEngine } from './components/RewriterEngine';
 import { VisualStudio } from './components/VisualStudio';
-import { EngagementAssistant } from './components/EngagementAssistant';
-import { ActivityDashboard } from './components/ActivityDashboard';
-import { FeedViewer } from './components/FeedViewer';
-import { BrandKitManager } from './components/BrandKitManager';
+import { TrendAnalyser } from './components/TrendAnalyser';
 import { ToastProvider } from './contexts/ToastContext';
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState<'campaign' | 'discover' | 'repurpose' | 'generator' | 'rewriter' | 'visuals' | 'engagement' | 'command' | 'trend' | 'library' | 'feed' | 'brand_kit'>('discover');
+function App() {
+  const [activeTab, setActiveTab] = useState<any>('discover');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [prefillData, setPrefillData] = useState<any>(null);
-  const [navHistory, setNavHistory] = useState<{tab: string, data: any}[]>([]);
-  const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({});
   const [user, setUser] = useState<any>(null);
+  const [navHistory, setNavHistory] = useState<string[]>([]);
+  const [prefillData, setPrefillData] = useState<any>(null);
+  const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const cached = localStorage.getItem('user');
-    if(cached) setUser(JSON.parse(cached));
-
-    const originalFetch = window.fetch;
-    window.fetch = async (input, init) => {
-      const email = localStorage.getItem('user_email');
-      if (email) {
-         init = init || {};
-         init.headers = { ...init.headers, 'x-user-email': email };
-      }
-      return originalFetch(input, init);
-    };
-    return () => { window.fetch = originalFetch; };
+    const saved = localStorage.getItem('omni_user');
+    if (saved) setUser(JSON.parse(saved));
   }, []);
 
-  const handleLogin = (userData: any) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('user_email', userData.email);
-    setUser(userData);
-  }
+  const handleLogin = (u: any) => {
+    setUser(u);
+    localStorage.setItem('omni_user', JSON.stringify(u));
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('user_email');
     setUser(null);
-  }
+    localStorage.removeItem('omni_user');
+  };
 
-  const handleNavigate = (featureId: string, data: any) => {
-    setNavHistory(prev => [...prev, { tab: activeTab, data: prefillData }]);
-    setActiveTab(featureId as any);
-    setPrefillData(data);
+  const handleNavigate = (id: any, data?: any) => {
+    setNavHistory(prev => [...prev, activeTab]);
+    setActiveTab(id);
+    if(data) setPrefillData(data);
   };
 
   const handleBack = () => {
-    setNavHistory(prev => {
-      const newHistory = [...prev];
-      const last = newHistory.pop();
-      if (last) {
-        setActiveTab(last.tab as any);
-        setPrefillData(last.data);
-      }
-      return newHistory;
-    });
+    if (navHistory.length === 0) return;
+    const prev = navHistory[navHistory.length - 1];
+    setNavHistory(prevHistory => prevHistory.slice(0, -1));
+    setActiveTab(prev);
+    setPrefillData(null);
   };
 
   const setTabAndHistory = (id: any) => {
-    if (activeTab !== id) {
-      setNavHistory(prev => [...prev, { tab: activeTab, data: prefillData }]);
+    if(activeTab !== id) {
+       setNavHistory([]);
     }
     setActiveTab(id);
     setPrefillData(null);
@@ -227,3 +227,5 @@ export default function App() {
     </ToastProvider>
   );
 }
+
+export default App;
